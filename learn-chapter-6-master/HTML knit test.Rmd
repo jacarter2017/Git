@@ -1,0 +1,79 @@
+---
+title: "Chunkies"
+author: "Jamie Carter"
+date: "August 27, 2018"
+output:
+  html_document: 
+    toc: true
+    toc_float: true
+    theme: united
+    highlight: espresso
+---
+
+
+```{r chunk, warnings=FALSE,message=FALSE,echo=FALSE}
+library(DT)
+library(dplyr)
+library(readr)
+library(tidyverse)
+
+payroll<-read_csv("C:/Users/jacarter2017/Desktop/Maps module/learn-chapter-6-master/data/bostonpayroll2013.csv") 
+colnames(payroll)<-make.names(colnames(payroll))
+
+payroll$REGULAR <- gsub("\\$", "", payroll$REGULAR)
+payroll$REGULAR <- gsub(",", "", payroll$REGULAR)
+payroll$REGULAR <- as.numeric(payroll$REGULAR)
+payroll$RETRO <- gsub("\\$", "", payroll$RETRO)
+payroll$RETRO <- gsub(",", "", payroll$RETRO)
+payroll$RETRO <- as.numeric(payroll$RETRO)
+payroll$OTHER <- gsub("\\$", "", payroll$OTHER)
+payroll$OTHER <- gsub(",", "", payroll$OTHER)
+payroll$OTHER <- as.numeric(payroll$OTHER)
+payroll$OTHER <- gsub("\\$", "", payroll$OTHER)
+payroll$OTHER <- gsub(",", "", payroll$OTHER)
+payroll$OTHER <- as.numeric(payroll$OTHER)
+payroll$OVERTIME <- gsub("\\$", "", payroll$OVERTIME)
+payroll$OVERTIME <- gsub(",", "", payroll$OVERTIME)
+payroll$OVERTIME <- as.numeric(payroll$OVERTIME)
+payroll$INJURED <- gsub("\\$", "", payroll$INJURED)
+payroll$INJURED <- gsub(",", "", payroll$INJURED)
+payroll$INJURED <- as.numeric(payroll$INJURED)
+payroll$DETAIL <- gsub("\\$", "", payroll$DETAIL)
+payroll$DETAIL <- gsub(",", "", payroll$DETAIL)
+payroll$DETAIL <- as.numeric(payroll$DETAIL)
+payroll$QUINN <- gsub("\\$", "", payroll$QUINN)
+payroll$QUINN <- gsub(",", "", payroll$QUINN)
+payroll$QUINN <- as.numeric(payroll$QUINN)
+payroll$TOTAL.EARNINGS <- gsub("\\$", "", payroll$TOTAL.EARNINGS)
+payroll$TOTAL.EARNINGS <- gsub(",", "", payroll$TOTAL.EARNINGS)
+payroll$TOTAL.EARNINGS <- as.numeric(payroll$TOTAL.EARNINGS)
+
+payroll_total<-select(payroll,NAME,TITLE,DEPARTMENT,TOTAL.EARNINGS)
+most_pay<-payroll_total %>% 
+  arrange(desc(TOTAL.EARNINGS)) %>% 
+  head(1)
+
+```
+The Boston city employee who was paid the most in 2014 was a `r most_pay$TITLE` at
+`r most_pay$DEPARTMENT`. This person made $`r prettyNum(most_pay$TOTAL.EARNINGS,big.mark=",",scientific=FALSE)`.
+```{r table, warnings=FALSE,message=FALSE,echo=FALSE}
+datatable(payroll,extensions="Buttons",options=list(
+  dom="Bfrtip",
+  buttons=c("copy","csv","excel","pdf","print")
+))
+```
+
+```{r analysis, warning=F, message=F}
+top5 <- payroll %>%
+group_by(DEPARTMENT) %>%
+summarize(Average.Earnings=mean(TOTAL.EARNINGS, na.rm=T)) %>%
+arrange(desc(Average.Earnings)) %>%
+  head(5)
+
+```
+
+```{r table2, warning=F, echo=F}
+library(knitr)
+kable(top5)
+```
+
